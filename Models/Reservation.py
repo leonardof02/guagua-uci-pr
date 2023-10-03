@@ -30,7 +30,7 @@ class Reservation:
         return True if result else False
     
     def findByUserId(telegram_id):
-        result = db.execute("SELECT 'order' FROM 'Reservation' WHERE user_id = ?", (telegram_id,))
+        result = db.execute("SELECT 'order' FROM 'Reservation' WHERE user_id = ?", (telegram_id,)).fetchone()
         return result
     
     def findByPk(reservation_id):

@@ -2,6 +2,9 @@ import logging
 from telegram import Update
 from telegram.ext import Application
 
+from Models.User import User
+from Models.Reservation import Reservation
+
 from Constants import TOKEN, ID_ADMIN
 
 class Bot:
@@ -18,7 +21,13 @@ class Bot:
         return update.message.from_user.id == ID_ADMIN
     
     def config(self):
+        self.initDB()
         self.set_logger()
+        
+
+    def initDB(self):
+        User.create_table()
+        Reservation.create_table()
 
     def set_logger(self):
         logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)

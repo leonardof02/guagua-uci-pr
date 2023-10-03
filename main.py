@@ -1,10 +1,11 @@
 from telegram import Update
-from telegram.ext import CommandHandler, MessageHandler, filters
+from telegram.ext import CommandHandler, MessageHandler, CallbackQueryHandler, filters
 
 from Bot import *
 
 from Controllers.ReservationController import ReservationController
 from Controllers.UserController import UserController
+from CallbackQueryRouter.Router import Router
 
 def main() -> None:
     guagua_pr_bot = Bot()
@@ -15,6 +16,9 @@ def main() -> None:
     
     # Filters
     guagua_pr_bot.application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, None))
+
+    # Callback Query Router
+    guagua_pr_bot.application.add_handler(CallbackQueryHandler( Router.defineRoutes ))
 
     # Run Bot
     guagua_pr_bot.application.run_polling(allowed_updates=Update.ALL_TYPES)

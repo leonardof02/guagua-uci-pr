@@ -1,15 +1,21 @@
 import pathlib
 
-from telegram import Update
-from telegram.ext import ContextTypes
+from telegram import Update, CallbackQuery
+from telegram.ext import ContextTypes, CallbackContext
 
 from Models.User import User
-from Constants import ASSETS_PATH
+from Constants.Env import ASSETS_PATH, ID_ADMIN
 
 # User management controller
 class UserController:
 
+    # Verify if this user is admin
+    @staticmethod
+    def is_from_admin(update: Update):
+        return update.message.from_user.id == ID_ADMIN
+
     # Create a user when /start the bot
+    @staticmethod
     async def register_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         
         user_id = update.message.from_user.id
@@ -25,8 +31,15 @@ class UserController:
             return
 
         if User.exists(user_id):
+            await update.message.delete()
             await update.message.reply_text(rf"ℹ️ El usuario: {full_name} (@{username}) ya esta registrado")
             return
         
         User.create_user(user_id, username, full_name)
         await update.message.reply_text(rf"✅ El usuario: {full_name} (@{username}) fue registrado satisfactoriamente")
+
+
+    @staticmethod
+    async def cancel_reservation(update: Update, context: CallbackContext, query: CallbackQuery):
+        await update.effective_message.delete()
+        await update.effective_message.reply_text("a")

@@ -28,4 +28,3 @@ class User:
     def findByPk(user_id):
         result = db.execute("SELECT * FROM User WHERE telegram_id = ?", (user_id,)).fetchone();
         return result
-

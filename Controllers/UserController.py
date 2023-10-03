@@ -36,10 +36,4 @@ class UserController:
             return
         
         User.create_user(user_id, username, full_name)
-        await update.message.reply_text(rf"✅ El usuario: {full_name} (@{username}) fue registrado satisfactoriamente")
-
-
-    @staticmethod
-    async def cancel_reservation(update: Update, context: CallbackContext, query: CallbackQuery):
-        await update.effective_message.delete()
-        await update.effective_message.reply_text("a")
+        await update.message.reply_text(rf"✅ El usuario: {full_name} (@{username}) fue registrado satisfactoriamente")        

@@ -3,13 +3,14 @@ from telegram.ext import CallbackContext
 
 from Constants.CallbackData import CANCEL_RESERVATION
 from Controllers.UserController import UserController
+from Controllers.ReservationController import ReservationController
 
 class Router:
     """Class for redirecting `callback data` from Markups to respective controllers"""
 
     # Callback data actions name and functions to execute
     ACTIONS = {
-        CANCEL_RESERVATION: UserController.cancel_reservation
+        CANCEL_RESERVATION: ReservationController.cancel_reservation
     }
 
     # Redirect callback action to respective functions

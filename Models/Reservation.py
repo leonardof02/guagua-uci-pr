@@ -41,7 +41,11 @@ class Reservation:
         result = db.execute("""--sql
             SELECT ROW_NUMBER() OVER(ORDER BY created_at) AS arrival_order
             FROM "Reservation"
-            ORDER BY created_at;""").fetchone();
+            ORDER BY created_at""").fetchone();
         return result[0]
+    
+    def deleteByUserId(telegram_id):
+        db.execute("DELETE FROM 'Reservation' WHERE user_id = ?", (telegram_id,))
+        connection.commit()
 
 

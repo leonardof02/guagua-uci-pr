@@ -12,11 +12,14 @@ class ReservationController:
         user_id = update.message.from_user.id
         username = update.message.from_user.username
         full_name = update.message.from_user.full_name
+
         reservation = Reservation.findByUserId(user_id)
 
         if( reservation ):
-            await update.message.reply_text(rf"⏱️ Ya usted reservo: {full_name} (@{username}) \nTurno #{reservation}")
+            # Number of arrival
+            arrival_order = Reservation.getArrivalOrderByUser(user_id);
+            await update.message.reply_text(f"⏱️ Ya usted reservo: {full_name} @{username}) \n 🔢 Turno: {arrival_order}")
             return
 
         new_reservation = Reservation.create_reservation(user_id)
-        await update.message.reply_text(rf"✅🆕 Se ha creado una reservacion para usted: {full_name} (@{username}) \nTurno #{new_reservation}")
+        await update.message.reply_text(f"✅🆕 Se ha creado una reservacion para usted: {full_name} (@{username}) \n Turno #{new_reservation}")

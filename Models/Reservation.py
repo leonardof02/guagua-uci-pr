@@ -6,7 +6,6 @@ class Reservation:
         db.execute("""--sql
             CREATE TABLE IF NOT EXISTS "Reservation" (
                 reservation_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                'order' INTEGER,
                 user_id INTEGER NOT NULL,
                 created_at TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES User(telegram_id)
@@ -15,9 +14,9 @@ class Reservation:
 
     def create_reservation(telegram_id: int):
         db.execute("""--sql
-            INSERT INTO "Reservation" (telegram_id, order, created_at)
+            INSERT INTO "Reservation" (user_id, created_at)
             VALUES
-                ( ROWID, ?, datetime('now') );
+                ( ?, datetime('now') );
         """, (telegram_id,))
         connection.commit()
 
@@ -37,4 +36,12 @@ class Reservation:
         result = db.execute("SELECT * FROM 'Reservation' WHERE telegram_id = ?", (reservation_id,)).fetchone();
         print(result)
         return result
+    
+    def getArrivalOrderByUser(telegram_id):
+        result = db.execute("""--sql
+            SELECT ROW_NUMBER() OVER(ORDER BY created_at) AS arrival_order
+            FROM "Reservation"
+            ORDER BY created_at;""").fetchone();
+        return result[0]
+
 

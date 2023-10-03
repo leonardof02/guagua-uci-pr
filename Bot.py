@@ -23,7 +23,6 @@ class Bot:
     def config(self):
         self.initDB()
         self.set_logger()
-        
 
     def initDB(self):
         User.create_table()

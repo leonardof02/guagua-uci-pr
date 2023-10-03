@@ -1,7 +1,10 @@
+import pathlib
+
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from Models.User import User
+from Constants import ASSETS_PATH
 
 # User management controller
 class UserController:
@@ -14,7 +17,11 @@ class UserController:
         full_name = update.message.from_user.full_name
 
         if( not username ):
-            await update.message.reply_text(rf"🛑 Por favor creese su nombre de usuario y regrese luego")
+            reply_text = f"""🛑 Para el correcto funcionamiento del bot es necesario que se cree su username:\n
+            Vaya a ajustes de su perfil y creese un username unico por favor.
+            """
+            img_path = pathlib.Path(ASSETS_PATH).resolve();
+            await update.message.reply_photo(photo=(open(img_path, "+rb")), caption=reply_text)
             return
 
         if User.exists(user_id):

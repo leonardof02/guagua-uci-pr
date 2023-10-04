@@ -1,4 +1,5 @@
 import sqlite3
+from typing import Tuple
 
-connection = sqlite3.connect("guaguaPR.db")
-db = connection.cursor()
+with sqlite3.connect("guaguaPR.db") as connection:
+    db = connection.cursor()

@@ -39,9 +39,10 @@ class Reservation:
     
     def getArrivalOrderByUser(telegram_id):
         result = db.execute("""--sql
-            SELECT ROW_NUMBER() OVER(ORDER BY created_at) AS arrival_order
-            FROM "Reservation"
-            ORDER BY created_at""").fetchone();
+            SELECT arrival_order FROM 
+            (SELECT user_id, ROW_NUMBER() OVER(ORDER BY created_at ASC) AS arrival_order FROM "Reservation")
+            WHERE user_id = ?
+        """, (telegram_id,)).fetchone();
         return result[0]
     
     def deleteByUserId(telegram_id):

@@ -18,5 +18,7 @@ class Router:
         query = update.callback_query
         action = query.data
 
-        if( Router.ACTIONS[action] ):
-            await Router.ACTIONS[action](update, context, query)
+        if( isinstance(action, str) and Router.ACTIONS[action] ):
+            await Router.ACTIONS[action](update, context)
+        else:
+            await Router.ACTIONS[action.name](update, context)

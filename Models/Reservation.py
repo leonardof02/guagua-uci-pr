@@ -7,8 +7,10 @@ class Reservation:
             CREATE TABLE IF NOT EXISTS "Reservation" (
                 reservation_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 user_id INTEGER NOT NULL,
+                person_id INTEGER NOT NULL,
                 created_at TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES User(telegram_id)
+                FOREIGN KEY (user_id) REFERENCES User(telegram_id),
+                FOREIGN KEY (person_id) REFERENCES Person(id)
             );
         """)
 
@@ -44,6 +46,11 @@ class Reservation:
             WHERE user_id = ?
         """, (telegram_id,)).fetchone();
         return result[0]
+    
+    def get_all_by_user_id(user_id: int):
+        result = db.execute("""--sql
+            SELECT * FROM Reservation WHERE user_id = ? 
+        """, (user_id,)).fetchall();
     
     def deleteByUserId(telegram_id):
         db.execute("DELETE FROM 'Reservation' WHERE user_id = ?", (telegram_id,))

@@ -38,7 +38,7 @@ class ReservationController:
         )
 
     @staticmethod
-    async def cancel_reservation(update: Update, context: CallbackContext, query: CallbackQuery):
+    async def cancel_reservation(update: Update, context: CallbackContext):
         await update.effective_message.delete()
 
         user_id = update.effective_user.id

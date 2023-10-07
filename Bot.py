@@ -4,6 +4,7 @@ from telegram.ext import Application
 
 from Models.User import User
 from Models.Reservation import Reservation
+from Models.Person import Person
 
 from Constants.Env import TOKEN, ID_ADMIN
 
@@ -23,6 +24,7 @@ class Bot:
 
     def initDB(self):
         User.create_table()
+        Person.create_table()
         Reservation.create_table()
 
     def set_logger(self):
@@ -32,4 +34,3 @@ class Bot:
 
     def run(self):
         self.application.run_polling(allowed_updates=Update.ALL_TYPES)
-        print("Bot running... " +  self.TOKEN )

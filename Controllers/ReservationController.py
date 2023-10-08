@@ -2,13 +2,13 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Callbac
 from telegram.ext import ContextTypes, CallbackContext
 
 from Models.Reservation import Reservation
-from Constants.CallbackData import CANCEL_RESERVATION
+from Constants.CallbackDataActions import Actions
 
 # Reservation management controller
 class ReservationController:
 
     # UI Elements
-    cancel_reservation_button = InlineKeyboardButton("🚫🚌 Cancelar Reservacion", callback_data=CANCEL_RESERVATION);
+    cancel_reservation_button = InlineKeyboardButton("🚫🚌 Cancelar Reservacion", callback_data=Actions.CANCEL_RESERVATION);
     cancel_reservation_markup = InlineKeyboardMarkup([[cancel_reservation_button]])
 
     # Create a unique reservation by User

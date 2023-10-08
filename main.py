@@ -3,11 +3,9 @@ from telegram.ext import CommandHandler, CallbackQueryHandler, ConversationHandl
 from Bot import *
 
 from Controllers.ReservationController import ReservationController
-from Controllers.PersonController import PersonController
+from Controllers.PersonController.PersonController import PersonController, person_conversation_handler
 from Controllers.AdminController import AdminController
 from Controllers.UserController import UserController
-
-from CallbackQueryObjects.Router import Router
 
 def main() -> None:
     guagua_pr_bot = Bot()
@@ -15,16 +13,13 @@ def main() -> None:
     # Commands
     guagua_pr_bot.application.add_handlers([
         CommandHandler("start", UserController.register_user ),
-        CommandHandler("reservar", ReservationController.create_reservation ),
         CommandHandler("forward", AdminController.forward_message ),
-        CommandHandler("personas", PersonController.get_persons)
     ])
     
-    # Conversation Handler
-    guagua_pr_bot.application.add_handler( PersonController.register_person_conv_handler )
+    # Conversation Handlers
+    guagua_pr_bot.application.add_handler( person_conversation_handler )
 
-    # Callback Query Router
-    guagua_pr_bot.application.add_handler(CallbackQueryHandler( Router.defineRoutes ))
+    # Callback Query Handlers
 
     # Run Bot
     guagua_pr_bot.run()

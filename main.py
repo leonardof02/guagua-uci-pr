@@ -2,7 +2,7 @@ from telegram.ext import CommandHandler, CallbackQueryHandler, ConversationHandl
 
 from Bot import *
 
-from Controllers.ReservationController import ReservationController
+from Controllers.ReservationController import ReservationController, reservation_conversation_handler, reservation_callback_query
 from Controllers.PersonController.PersonController import PersonController, person_conversation_handler
 from Controllers.AdminController import AdminController
 from Controllers.UserController import UserController
@@ -18,8 +18,10 @@ def main() -> None:
     
     # Conversation Handlers
     guagua_pr_bot.application.add_handler( person_conversation_handler )
+    guagua_pr_bot.application.add_handler( reservation_conversation_handler )
 
     # Callback Query Handlers
+    guagua_pr_bot.application.add_handler( reservation_callback_query )
 
     # Run Bot
     guagua_pr_bot.run()

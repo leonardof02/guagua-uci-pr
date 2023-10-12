@@ -35,5 +35,5 @@ class AdminController:
         answer = "🟩 Listado de reservas \nOrden | Nombre | Reservado por \n --------------------------------------------------\n"
         for reservation in all_reservation:
             order, name, reserved_by = reservation
-            answer += f"```{order} - {name}: por {reserved_by}\n```"
+            answer += f"{order} - {name}: por {reserved_by}\n"
         await update.message.reply_text(answer, parse_mode="Markdown")

@@ -41,7 +41,7 @@ class Person:
     
     def get_person_id_by_name_from_telegram_id(telegram_id: int, name: str) -> str:
         result: list = db.execute("""SELECT id FROM 'Person' WHERE user_id = ? AND name = ?;""", (telegram_id, name)).fetchone()
-        return result[0]
+        return result
     
     @staticmethod
     def edit_person_name_by_pk(id: int, name: str):

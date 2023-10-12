@@ -19,7 +19,7 @@ class Reservation:
     @staticmethod
     def get_all_reservations():
         result = db.execute("""--sql
-            SELECT ROW_NUMBER() OVER( ORDER BY created_at ASC) as arrival_order, name, created_at, reservado_por
+            SELECT ROW_NUMBER() OVER( ORDER BY created_at ASC) as arrival_order, name, reservado_por
                 FROM (
                     SELECT Person.name, Person.created_at, User.telegram_id, User.full_name as reservado_por
                         FROM Reservation
@@ -67,6 +67,25 @@ class Reservation:
         connection.commit()
 
     @staticmethod
+    def get_reservation_by_user_id_and_name(telegram_id: int, person_name: str):
+        result = db.execute("""--sql
+            SELECT reservation_id, arrival_order, name FROM (
+                SELECT ROW_NUMBER() OVER( ORDER BY created_at ASC) as arrival_order, name, created_at, reservado_por, telegram_id, reservation_id
+                    FROM (
+                        SELECT Reservation.reservation_id, Person.name, Person.created_at, User.telegram_id, User.full_name as reservado_por
+                            FROM Reservation
+                            INNER JOIN Person ON Person.id = Reservation.person_id
+                            INNER JOIN "User" ON User.telegram_id = Reservation.user_id
+                    )) WHERE telegram_id = ? AND name = ?
+        """, (telegram_id, person_name)).fetchone()
+        return result
+    
+    @staticmethod
+    def clean():
+        db.execute("DELETE FROM Reservation")
+        connection.commit()
+
+    @staticmethod
     def exists(reservation_id: int) -> bool:
         result = Reservation.findByPk(reservation_id);
         return True if result else False
@@ -82,7 +101,7 @@ class Reservation:
         return True if result else False
     
     @staticmethod
-    def findByUserId(telegram_id: int):
+    def find_by_id(telegram_id: int):
         result = db.execute("SELECT 'order' FROM 'Reservation' WHERE user_id = ?", (telegram_id,)).fetchone()
         return result
     
@@ -91,15 +110,6 @@ class Reservation:
         result = db.execute("SELECT * FROM 'Reservation' WHERE telegram_id = ?", (reservation_id,)).fetchone();
         print(result)
         return result
-    
-    @staticmethod
-    def getArrivalOrderByUser(telegram_id: int):
-        result = db.execute("""--sql
-            SELECT arrival_order FROM 
-            (SELECT user_id, ROW_NUMBER() OVER(ORDER BY created_at ASC) AS arrival_order FROM "Reservation")
-            WHERE user_id = ?
-        """, (telegram_id,)).fetchone();
-        return result[0]
     
     @staticmethod
     def get_all_by_user_id(user_id: int):

@@ -2,8 +2,8 @@ from telegram.ext import CommandHandler, CallbackQueryHandler, ConversationHandl
 
 from Bot import *
 
-from Controllers.ReservationController import ReservationController, reservation_conversation_handler, reservation_callback_query
-from Controllers.PersonController.PersonController import PersonController, person_conversation_handler
+from Controllers.ReservationController.ReservationController import reservation_conversation_handler, reservation_callback_query
+from Controllers.PersonController.PersonController import person_conversation_handler
 from Controllers.AdminController import AdminController
 from Controllers.UserController import UserController
 
@@ -14,6 +14,8 @@ def main() -> None:
     guagua_pr_bot.application.add_handlers([
         CommandHandler("start", UserController.register_user ),
         CommandHandler("forward", AdminController.forward_message ),
+        CommandHandler("forward_clean", AdminController.forward_message_and_clean_reservations ),
+        CommandHandler("get_listado", AdminController.get_list_reservation)
     ])
     
     # Conversation Handlers

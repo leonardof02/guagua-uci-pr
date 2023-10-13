@@ -32,8 +32,8 @@ class AdminController:
 
     async def get_list_reservation(update: Update, context: ContextTypes.DEFAULT_TYPE):
         all_reservation = Reservation.get_all_reservations()
-        answer = "🟩 Listado de reservas \nOrden | Nombre | Reservado por \n --------------------------------------------------\n"
+        answer = "🟩 Listado de reservas \nOrden | Nombre | Puente | Reservado por \n --------------------------------------------------\n"
         for reservation in all_reservation:
-            order, name, reserved_by = reservation
-            answer += f"{order} - {name}: por {reserved_by}\n"
+            order, name, location, reserved_by = reservation
+            answer += f"{order} - {name} | Puente: {location}: por {reserved_by}\n"
         await update.message.reply_text(answer, parse_mode="Markdown")

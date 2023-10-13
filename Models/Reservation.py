@@ -19,9 +19,9 @@ class Reservation:
     @staticmethod
     def get_all_reservations():
         result = db.execute("""--sql
-            SELECT ROW_NUMBER() OVER( ORDER BY created_at ASC) as arrival_order, name, reservado_por
+            SELECT ROW_NUMBER() OVER( ORDER BY created_at ASC) as arrival_order, name, location, reservado_por
                 FROM (
-                    SELECT Person.name, Person.created_at, User.telegram_id, User.full_name as reservado_por
+                    SELECT Person.name, Person.created_at, Person.location, User.telegram_id, User.full_name as reservado_por
                         FROM Reservation
                         INNER JOIN Person ON Person.id = Reservation.person_id
                         INNER JOIN "User" ON User.telegram_id = Reservation.user_id

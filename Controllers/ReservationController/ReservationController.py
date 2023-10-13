@@ -21,10 +21,10 @@ class ReservationController:
         answer = "*✒️ A que persona vas a reservar?:* \n------------------------------------------\n"
         
         for person in persons:
-            (id, name) = person
+            (id, name, location) = person
             button_text = f"{name}"
             persons_reply_markup.append([button_text])
-            answer += f"🚹 - {name}\n"
+            answer += f"🚹 - {name} | 🗺️ Municipio: {location}\n"
 
         persons_reply_markup.append(["/cancelar ❌"])
         
@@ -60,7 +60,7 @@ class ReservationController:
         telegram_id = update.effective_user.id
         persons = Person.get_all_persons_by_telegram_id( telegram_id )
         for person in persons:
-            id, name = person
+            (id, *_) = person
             if( not Reservation.exist_person(id) ):
                 Reservation.create_reservation( telegram_id, id )
         await update.message.reply_text("✅ Todas las personas han sido reservadas con exito!")

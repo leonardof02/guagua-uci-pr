@@ -28,18 +28,22 @@ class PersonController:
         await update.message.reply_text(
             f"Hola {full_name} por favor inserte el nombe de la persona que quieres agregar para anotarse: ",
         )
-        return ConversationStates.REGISTER_PERSON
+        return ConversationStates.GET_LOCATION
 
     # REGISTER_PERSON
     @staticmethod
     async def register_person(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-        Person.create_person( update.message.text, update.effective_user.id )
-        await update.message.reply_text(f"Persona agregada con exito: {update.message.text}")
+        person_name = context.user_data.get("person_name")
+        person_location = update.message.text
+        Person.create_person(person_name, person_location, update.effective_user.id)
+        await update.message.reply_text(f"✅ Persona agregada con exito!: {person_name}")
+        context.user_data.clear()
         return ConversationHandler.END
     
     # CANCEL_OPERATION
     @staticmethod
     async def cancel_operations(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+        context.user_data.clear()
         await update.message.reply_text( "Operacion Cancelada", reply_markup=ReplyKeyboardRemove() )
         return ConversationHandler.END
     
@@ -63,20 +67,30 @@ class PersonController:
     # START_EDIT_PERSON
     @staticmethod
     async def get_person_name_for_edit(update: Update, context: CallbackContext):
-
         person_name = update.message.text
-        pk = Person.get_person_id_by_name_from_telegram_id(update.effective_user.id, person_name)
+        (pk,) = Person.get_person_id_by_name_from_telegram_id(update.effective_user.id, person_name)
         context.user_data["pk"] = pk
         await update.message.reply_text("Inserte el nombre nuevo de la persona: ", reply_markup=ReplyKeyboardRemove())
-        return ConversationStates.EDIT_PERSON
+        return ConversationStates.GET_LOCATION
+    
+    @staticmethod
+    async def get_person_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        context.user_data["person_name"] = update.message.text
+        await update.message.reply_text("🗺️ Inserte el municipio de la persona: ", reply_markup=ReplyKeyboardRemove())
+        if (context.user_data.get("pk")):
+            return ConversationStates.EDIT_PERSON
+        else:
+            return ConversationStates.REGISTER_PERSON
     
     # EDIT_PERSON
     @staticmethod
     async def edit_person(update: Update, context: CallbackContext):
-        person_name = update.message.text
+        person_location = update.message.text
+        person_name = context.user_data.get("person_name")
         pk = context.user_data.get("pk")
-        Person.edit_person_name_by_pk(pk, person_name)
-        await update.message.reply_text(f"Persona editada con exito!: {person_name}")
+        Person.edit_person_name_by_pk(pk, person_location, person_name)
+        await update.message.reply_text(f"✅ Persona editada con exito!: {person_name}")
+        context.user_data.clear()
         return ConversationHandler.END
     
     #### Remove Persons ###
@@ -114,10 +128,10 @@ class PersonController:
         answer = "*📜 Personas registradas:* \n------------------------------------------\n"
         
         for person in persons:
-            (id, name) = person
+            (id, name, location) = person
             button_text = f"{name}"
             persons_reply_markup.append([button_text])
-            answer += f"🚹 - {name}\n"
+            answer += f"🚹 - {name} | 🗺️ Municipio: {location}\n"
 
         persons_reply_markup.append(["/cancelar ❌"])
         
@@ -138,6 +152,7 @@ person_conversation_handler = ConversationHandler(
         ConversationStates.START_EDIT_PERSON: [MessageHandler(filters.TEXT & ~filters.COMMAND, PersonController.get_person_name_for_edit)],
         ConversationStates.EDIT_PERSON: [MessageHandler(filters.TEXT & ~filters.COMMAND, PersonController.edit_person)],
         ConversationStates.DELETE_PERSON: [MessageHandler(filters.TEXT & ~filters.COMMAND, PersonController.delete_person)],
+        ConversationStates.GET_LOCATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, PersonController.get_person_location)],
     },
     fallbacks=[CommandHandler("cancelar", PersonController.cancel_operations)],
 )

@@ -8,6 +8,7 @@ class Person:
             CREATE TABLE IF NOT EXISTS "Person" (
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 name TEXT NOT NULL,
+                location TEXT NOT NULL,
                 user_id INTEGER NOT NULL,
                 created_at TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES User(telegram_id) ON DELETE CASCADE
@@ -15,13 +16,13 @@ class Person:
         """)
 
     @staticmethod
-    def create_person(name: str, telegram_id: int):
+    def create_person(name: str, location: str, telegram_id: int):
         db.execute("""--sql
-            INSERT INTO "Person" (name, user_id, created_at)
+            INSERT INTO "Person" (name, location, user_id, created_at)
             VALUES
-                ( ?, ?, datetime('now') );
+                ( ?, ?, ?, datetime('now') );
         """,
-        ( name, telegram_id ))
+        ( name, location, telegram_id ))
         connection.commit()
 
     @staticmethod
@@ -36,7 +37,7 @@ class Person:
     
     @staticmethod
     def get_all_persons_by_telegram_id(telegram_id: int) -> list[tuple[str]]:
-        result: list = db.execute("""SELECT id, name FROM 'Person' WHERE user_id = ?;""", (telegram_id,)).fetchall()
+        result: list = db.execute("""SELECT id, name, location FROM 'Person' WHERE user_id = ?;""", (telegram_id,)).fetchall()
         return result
     
     def get_person_id_by_name_from_telegram_id(telegram_id: int, name: str) -> str:
@@ -44,8 +45,8 @@ class Person:
         return result
     
     @staticmethod
-    def edit_person_name_by_pk(id: int, name: str):
-        db.execute("UPDATE Person SET name = ? WHERE id = ?", (name, id))
+    def edit_person_name_by_pk(id: int, location: str, name: str):
+        db.execute("UPDATE Person SET name = ?, location = ? WHERE id = ?", (name, location, id))
         connection.commit()
 
     @staticmethod

@@ -21,7 +21,7 @@ class Reservation:
         result = db.execute("""--sql
             SELECT ROW_NUMBER() OVER( ORDER BY created_at ASC) as arrival_order, name, location, reservado_por
                 FROM (
-                    SELECT Person.name, Person.created_at, Person.location, User.telegram_id, User.full_name as reservado_por
+                    SELECT Person.name, Reservation.created_at, Person.location, User.telegram_id, User.full_name as reservado_por
                         FROM Reservation
                         INNER JOIN Person ON Person.id = Reservation.person_id
                         INNER JOIN "User" ON User.telegram_id = Reservation.user_id
@@ -35,7 +35,7 @@ class Reservation:
             SELECT reservation_id, arrival_order, name FROM (
                 SELECT ROW_NUMBER() OVER( ORDER BY created_at ASC) as arrival_order, name, created_at, reservado_por, telegram_id, reservation_id
                 FROM (
-                    SELECT Reservation.reservation_id, Person.name, Person.created_at, User.telegram_id, User.full_name as reservado_por
+                    SELECT Reservation.reservation_id, Person.name, Reservation.created_at, User.telegram_id, User.full_name as reservado_por
                         FROM Reservation
                         INNER JOIN Person ON Person.id = Reservation.person_id
                         INNER JOIN "User" ON User.telegram_id = Reservation.user_id
@@ -49,7 +49,7 @@ class Reservation:
             SELECT reservation_id, arrival_order, name FROM (
                 SELECT ROW_NUMBER() OVER( ORDER BY created_at ASC) as arrival_order, name, created_at, reservado_por, telegram_id, reservation_id
                 FROM (
-                    SELECT Reservation.reservation_id, Person.name, Person.created_at, User.telegram_id, User.full_name as reservado_por
+                    SELECT Reservation.reservation_id, Person.name, Reservation.created_at, User.telegram_id, User.full_name as reservado_por
                         FROM Reservation
                         INNER JOIN Person ON Person.id = Reservation.person_id
                         INNER JOIN "User" ON User.telegram_id = Reservation.user_id
@@ -72,7 +72,7 @@ class Reservation:
             SELECT reservation_id, arrival_order, name FROM (
                 SELECT ROW_NUMBER() OVER( ORDER BY created_at ASC) as arrival_order, name, created_at, reservado_por, telegram_id, reservation_id
                     FROM (
-                        SELECT Reservation.reservation_id, Person.name, Person.created_at, User.telegram_id, User.full_name as reservado_por
+                        SELECT Reservation.reservation_id, Person.name, Reservation.created_at, User.telegram_id, User.full_name as reservado_por
                             FROM Reservation
                             INNER JOIN Person ON Person.id = Reservation.person_id
                             INNER JOIN "User" ON User.telegram_id = Reservation.user_id

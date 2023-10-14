@@ -6,6 +6,7 @@ from Controllers.ReservationController.ReservationController import reservation_
 from Controllers.PersonController.PersonController import person_conversation_handler
 from Controllers.AdminController import AdminController
 from Controllers.UserController import UserController
+from Controllers.HelpController import Tutorial
 
 def main() -> None:
     guagua_pr_bot = Bot()
@@ -15,7 +16,8 @@ def main() -> None:
         CommandHandler("start", UserController.register_user ),
         CommandHandler("forward", AdminController.forward_message ),
         CommandHandler("forward_clean", AdminController.forward_message_and_clean_reservations ),
-        CommandHandler("get_listado", AdminController.get_list_reservation)
+        CommandHandler("get_listado", AdminController.get_list_reservation),
+        CommandHandler("tutorial", Tutorial.get_tutorial)
     ])
     
     # Conversation Handlers

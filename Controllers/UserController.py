@@ -5,6 +5,7 @@ from telegram.ext import ContextTypes, CallbackContext
 
 from Models.User import User
 from Constants.Env import ASSETS_PATH
+from Controllers.HelpController import Tutorial
 
 # User management controller
 class UserController:
@@ -33,3 +34,4 @@ class UserController:
         
         User.create_user(user_id, username, chat_id, full_name)
         await update.message.reply_text(rf"✅ El usuario: {full_name} (@{username}) fue registrado satisfactoriamente")
+        await Tutorial.get_tutorial(update, context)

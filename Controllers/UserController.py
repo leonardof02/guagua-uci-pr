@@ -20,12 +20,7 @@ class UserController:
         chat_id = update.effective_chat.id
 
         if( not username ):
-            reply_text = f"""🛑 Para el correcto funcionamiento del bot es necesario que se cree su username:\n
-            Vaya a ajustes de su perfil y creese un username unico por favor.
-            """
-            img_path = pathlib.Path(ASSETS_PATH).resolve();
-            await update.message.reply_photo(photo=(open(img_path, "+rb")), caption=reply_text)
-            return
+            username = "No tiene"
 
         if User.exists(user_id):
             await update.message.delete()

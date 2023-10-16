@@ -14,7 +14,7 @@ class Helper:
         except:
             return False
 
-
+    @staticmethod
     def get_persons_keyboard_from_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> tuple[ Sequence[Sequence[str]], str ]:
         persons = Person.get_all_persons_by_telegram_id(update.effective_user.id)
         persons_reply_markup: Sequence[Sequence[str]] = [[]]

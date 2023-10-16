@@ -6,6 +6,8 @@ from Controllers.PersonController.ConversationStates import ConversationStates
 
 from Constants.CallbackDataActions import Actions
 from Models.Person import Person
+
+from Helpers.Validator import Validator
 from Helpers.Helper import Helper
 
 # Person Management Controller
@@ -36,6 +38,11 @@ class PersonController:
     async def register_person(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         person_name = context.user_data.get("person_name")
         person_location = update.message.text
+
+        if( not Validator.is_name(person_location) ):
+            await update.message.reply_text("🛑 Nombre no válido, operacion cancelada", reply_markup=ReplyKeyboardRemove())
+            return ConversationHandler.END
+        
         Person.create_person(person_name, person_location, update.effective_user.id)
         await update.message.reply_text(f"✅ Persona agregada con exito!: {person_name}")
         context.user_data.clear()
@@ -62,8 +69,8 @@ class PersonController:
             parse_mode="Markdown",
             reply_markup=ReplyKeyboardMarkup(
                 persons_reply_markup , one_time_keyboard=True,
-                input_field_placeholder="Tus personas"
-                ))
+                input_field_placeholder="Nombre de la persona"
+            ))
         return ConversationStates.START_EDIT_PERSON
 
     # START_EDIT_PERSON
@@ -71,10 +78,15 @@ class PersonController:
     async def get_person_name_for_edit(update: Update, context: CallbackContext):
         await update.message.delete()
         person_name = update.message.text
+
+        if( not Validator.is_name(person_name) ):
+            await update.message.reply_text("🛑 Nombre no válido, operacion cancelada", reply_markup=ReplyKeyboardRemove())
+            return ConversationHandler.END
+
         person = Person.get_person_id_by_name_from_telegram_id(update.effective_user.id, person_name)
         
         if( not person ):
-            await update.message.reply_text("🛑 No existe esa persona", reply_markup=ReplyKeyboardRemove())
+            await update.message.reply_text("🛑 No existe esa persona, operacion cancelada", reply_markup=ReplyKeyboardRemove())
             return ConversationHandler.END
 
         (pk,) = person
@@ -84,6 +96,12 @@ class PersonController:
     
     @staticmethod
     async def get_person_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        person_name = update.message.text
+        
+        if( not Validator.is_name(person_name) ):
+            await update.message.reply_text("🛑 Nombre no válido, operacion cancelada", reply_markup=ReplyKeyboardRemove())
+            return ConversationHandler.END
+
         context.user_data["person_name"] = update.message.text
         await update.message.reply_text("🗺️ Inserte el municipio de la persona: ", reply_markup=ReplyKeyboardRemove())
         if (context.user_data.get("pk")):
@@ -95,6 +113,11 @@ class PersonController:
     @staticmethod
     async def edit_person(update: Update, context: CallbackContext):
         person_location = update.message.text
+        
+        if( not Validator.is_name(person_location) ):
+            await update.message.reply_text("🛑 Nombre no válido, operacion cancelada", reply_markup=ReplyKeyboardRemove())
+            return ConversationHandler.END
+
         person_name = context.user_data.get("person_name")
         pk = context.user_data.get("pk")
         Person.edit_person_name_by_pk(pk, person_location, person_name)
@@ -117,7 +140,7 @@ class PersonController:
             reply_markup=ReplyKeyboardMarkup(
                 persons_reply_markup,
                 one_time_keyboard=True,
-                input_field_placeholder="Tus personas",
+                input_field_placeholder="Nombre de la persona",
                 ))
         
         return ConversationStates.DELETE_PERSON

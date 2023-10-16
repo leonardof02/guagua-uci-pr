@@ -36,6 +36,11 @@ class Person:
         return result[0]
     
     @staticmethod
+    def find_by_name(person_name: int):
+        result = db.execute("SELECT * FROM 'Person' WHERE id = ?", (person_name,)).fetchone()
+        return result
+    
+    @staticmethod
     def get_all_persons_by_telegram_id(telegram_id: int) -> list[tuple[str]]:
         result: list = db.execute("""SELECT id, name, location FROM 'Person' WHERE user_id = ?;""", (telegram_id,)).fetchall()
         return result

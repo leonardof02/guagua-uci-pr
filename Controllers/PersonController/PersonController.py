@@ -1,8 +1,6 @@
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ContextTypes, CallbackContext, filters, ConversationHandler, CommandHandler, MessageHandler
 
-from typing import Sequence
-
 from Controllers.PersonController.ConversationStates import ConversationStates
 
 from Constants.CallbackDataActions import Actions
@@ -15,7 +13,7 @@ class PersonController:
     ### Getting Persons ###
     @staticmethod
     async def get_persons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        persons_reply_markup, answer = PersonController.get_persons_keyboard(update, context)
+        persons_reply_markup, answer = Helper.get_persons_keyboard_from_user(update, context)
         await update.message.reply_text(answer, parse_mode="Markdown")
         return ConversationHandler.END
 
@@ -53,7 +51,7 @@ class PersonController:
     @staticmethod
     async def get_persons_for_edit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
-        persons_reply_markup, answer = PersonController.get_persons_keyboard(update, context)
+        persons_reply_markup, answer = Helper.get_persons_keyboard_from_user(update, context)
 
         await update.message.reply_text(
             f"*✏️ Selecciona el nombre de la persona que quieres editar:* \n\n{answer}",
@@ -68,7 +66,13 @@ class PersonController:
     @staticmethod
     async def get_person_name_for_edit(update: Update, context: CallbackContext):
         person_name = update.message.text
-        (pk,) = Person.get_person_id_by_name_from_telegram_id(update.effective_user.id, person_name)
+        person = Person.get_person_id_by_name_from_telegram_id(update.effective_user.id, person_name)
+        
+        if( not person ):
+            await update.message.reply_text("🛑 No existe esa persona", reply_markup=ReplyKeyboardRemove())
+            return ConversationHandler.END
+
+        (pk,) = person
         context.user_data["pk"] = pk
         await update.message.reply_text("Inserte el nombre nuevo de la persona: ", reply_markup=ReplyKeyboardRemove())
         return ConversationStates.GET_LOCATION
@@ -99,7 +103,7 @@ class PersonController:
     @staticmethod
     async def get_persons_for_delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
-        persons_reply_markup, answer = PersonController.get_persons_keyboard(update, context)
+        persons_reply_markup, answer = Helper.get_persons_keyboard_from_user(update, context)
 
         await update.message.reply_text(
             f"*🗑️ Selecciona el nombre de la persona a borrar:* \n\n{answer}",
@@ -116,29 +120,15 @@ class PersonController:
     @staticmethod
     async def delete_person(update: Update, context: CallbackContext):
         person_name = update.message.text
+        person = Person.get_person_id_by_name_from_telegram_id(update.effective_user.id, person_name)
+
+        if( not person ):
+            await update.message.reply_text("🛑 No existe esa persona", reply_markup=ReplyKeyboardRemove())
+            return ConversationHandler.END
+
         Person.delete_person_by_name_from_telegram_id(update.effective_user.id, update.message.text)
         await update.message.reply_text(f"Persona borrada con exito!: {person_name}", reply_markup=ReplyKeyboardRemove())
         return ConversationHandler.END
-    
-    ### Helpers ###
-
-    def get_persons_keyboard(update: Update, context: CallbackContext):
-        persons = Person.get_all_persons_by_telegram_id(update.effective_user.id)
-        persons_reply_markup: Sequence[Sequence[str]] = [[]]
-        answer = "*📜 Personas registradas:* \n------------------------------------------\n"
-        
-        for person in persons:
-            (id, name, location) = person
-            button_text = f"{name}"
-            persons_reply_markup.append([button_text])
-            answer += f"🚹 - {name} | 🗺️ Municipio: {location}\n"
-
-        persons_reply_markup.append(["/cancelar ❌"])
-        
-        if( len(persons) == 0 ):
-            answer = "🚧 *No tienes personas registradas*"
-        return persons_reply_markup, answer
-
     
 person_conversation_handler = ConversationHandler(
     entry_points=[
@@ -154,5 +144,5 @@ person_conversation_handler = ConversationHandler(
         ConversationStates.DELETE_PERSON: [MessageHandler(filters.TEXT & ~filters.COMMAND, PersonController.delete_person)],
         ConversationStates.GET_LOCATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, PersonController.get_person_location)],
     },
-    fallbacks=[CommandHandler("cancelar", PersonController.cancel_operations)],
+    fallbacks=[CommandHandler("cancelar", PersonController.cancel_operations), MessageHandler(filters.ALL, PersonController.cancel_operations)],
 )

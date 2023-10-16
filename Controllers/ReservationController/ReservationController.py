@@ -20,16 +20,11 @@ class ReservationController:
         persons_reply_markup: Sequence[Sequence[str]] = [[]]
         answer = "*✒️ A que persona vas a reservar?:* \n------------------------------------------\n"
         
-        for person in persons:
-            (id, name, location) = person
-            button_text = f"{name}"
-            persons_reply_markup.append([button_text])
-            answer += f"🚹 - {name} | 🗺️ Municipio: {location}\n"
-
-        persons_reply_markup.append(["/cancelar ❌"])
-        
-        if( len(persons) == 0 ):
-            answer = "🚧 *No existen reservas*"
+        if( not persons ):
+            await update.message.reply_text(":( Usted no ha registrado a ninguna persona todavia")
+            return
+                
+        persons_reply_markup, answer = Helper.get_persons_keyboard_from_user(update, context)
         
         await update.message.reply_text(answer, parse_mode="Markdown", reply_markup=ReplyKeyboardMarkup(persons_reply_markup))
         return ConversationStates.CREATE_RESERVATION
@@ -129,7 +124,10 @@ reservation_conversation_handler = ConversationHandler(
     states={
         ConversationStates.CREATE_RESERVATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, ReservationController.create_reservation)]
     },
-    fallbacks=[ CommandHandler("cancel", ReservationController.cancel_operations) ]
+    fallbacks=[
+        CommandHandler("cancel", ReservationController.cancel_operations),
+        MessageHandler(filters.ALL, ReservationController.cancel_operations)
+    ]
 )
 
 reservation_callback_query = CallbackQueryHandler(ReservationController.cancel_reservation)

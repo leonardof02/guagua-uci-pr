@@ -12,6 +12,8 @@ class AdminController:
     def is_from_admin(user_id) -> bool:
         return user_id == ID_ADMIN
     
+
+    # Comunication with users
     async def forward_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         id = update.effective_user.id
         if( not AdminController.is_from_admin(id) ):
@@ -29,6 +31,10 @@ class AdminController:
         for chat_id in User.get_all_users_chat_id():
             (user_id,) = chat_id
             await context.bot.send_message( chat_id=user_id, text=update.message.text.removeprefix("/forward_clean "))
+
+    # Admin Utilities
+    async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        Reservation.clean()
 
     async def get_list_reservation(update: Update, context: ContextTypes.DEFAULT_TYPE):
         all_reservation = Reservation.get_all_reservations()

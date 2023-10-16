@@ -7,21 +7,19 @@ class User:
         db.execute("""--sql
             CREATE TABLE IF NOT EXISTS "User" (
                 telegram_id INTEGER PRIMARY KEY NOT NULL,
-                username TEXT NOT NULL,
-                chat_id TEXT NOT NULL,
                 full_name TEXT,
                 created_at TIMESTAMP
             );
         """)
 
     @staticmethod
-    def create_user(telegram_id: int, username: str, chat_id:str, full_name: str,):
+    def create_user(telegram_id: int, full_name: str,):
         db.execute("""--sql
-            INSERT INTO "User" (telegram_id, username, chat_id, full_name, created_at)
+            INSERT INTO "User" (telegram_id, full_name, created_at)
             VALUES
-                ( ?, ?, ?, ?, datetime('now') );
+                ( ?, ?, datetime('now') );
         """,
-        ( telegram_id, username, chat_id, full_name ))
+        ( telegram_id, full_name ))
         connection.commit()
 
 

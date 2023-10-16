@@ -9,6 +9,5 @@ You must create a .env file in the root of the project with the following values
 
 ```env
 BOT_TOKEN="424523426246452542... (Bot token)"
-ASSETS_PATH="../guagua-pr-bot/Assets/username_tutorial.jpg"
 ID_ADMIN="34132415... (Telegram ID of the person you want to be admin)"
 ```

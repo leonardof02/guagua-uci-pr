@@ -4,6 +4,7 @@ from typing import Sequence
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes, CallbackContext, ConversationHandler, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 
+from Controllers.UserController import UserController
 from Controllers.ReservationController.ConversationStates import ConversationStates
 
 from Models.Reservation import Reservation
@@ -54,6 +55,7 @@ class ReservationController:
     async def create_reservation_for_all_person(update: Update, context: ContextTypes.DEFAULT_TYPE):
         telegram_id = update.effective_user.id
         persons = Person.get_all_persons_by_telegram_id( telegram_id )
+        await UserController.register_user(update, context)
         for person in persons:
             (id, *_) = person
             if( not Reservation.exist_person(id) ):
@@ -75,6 +77,7 @@ class ReservationController:
             return ConversationHandler.END
         
         person_id, = person
+        await UserController.register_user(update, context)
         if( not Reservation.exist_person(person_id) ):
             Reservation.create_reservation(telegram_id, person_id)
             await update.message.reply_text(f"✅ Se ha creado una reserva satisfactoriamente para: {person_name}", reply_markup=ReplyKeyboardRemove())
@@ -84,9 +87,10 @@ class ReservationController:
 
         action = { "name": "CANCEL_RESERVATION", "pk": reservation_id }
         cancel_reservation_button = InlineKeyboardButton("🚫🚌 Cancelar", callback_data=json.dumps(action))
+        failNumber = "" if arrival_order <= 45 else f"⚠️ *Fallo:* {arrival_order - 45}"
 
         await update.message.reply_text(
-            f"🪪 {person_name}\n*🔢 Turno:* {arrival_order}",
+            f"🪪 {person_name}\n*🔢 Turno:* {arrival_order}\n{failNumber}",
             parse_mode="Markdown",
             reply_markup=InlineKeyboardMarkup([[cancel_reservation_button]])
         )
@@ -103,6 +107,12 @@ class ReservationController:
         name, pk = json.loads(action).values()
 
         if( name != "CANCEL_RESERVATION" ):
+            return
+
+        reservation = Reservation.get_reservation_by_id(pk)
+        
+        if(not reservation):
+            await update.effective_message.reply_text(f"⛔🕘 Esa reservación ya no existe, vuelva a reservar")
             return
 
         reservation_id, arrival_order, name = Reservation.get_reservation_by_id(pk)

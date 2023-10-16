@@ -1,6 +1,7 @@
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ContextTypes, CallbackContext, filters, ConversationHandler, CommandHandler, MessageHandler
 
+from Controllers.UserController import UserController
 from Controllers.PersonController.ConversationStates import ConversationStates
 
 from Constants.CallbackDataActions import Actions
@@ -13,6 +14,7 @@ class PersonController:
     ### Getting Persons ###
     @staticmethod
     async def get_persons(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        await update.message.delete()
         persons_reply_markup, answer = Helper.get_persons_keyboard_from_user(update, context)
         await update.message.reply_text(answer, parse_mode="Markdown")
         return ConversationHandler.END
@@ -22,6 +24,7 @@ class PersonController:
     #  Create a person when /new command
     @staticmethod
     async def start_register_person(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+        await update.message.delete()
         full_name = update.effective_user.full_name
         await update.message.reply_text(
             f"Hola {full_name} por favor inserte el nombe de la persona que quieres agregar para anotarse: ",
@@ -51,6 +54,7 @@ class PersonController:
     @staticmethod
     async def get_persons_for_edit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
+        await update.message.delete()
         persons_reply_markup, answer = Helper.get_persons_keyboard_from_user(update, context)
 
         await update.message.reply_text(
@@ -65,6 +69,7 @@ class PersonController:
     # START_EDIT_PERSON
     @staticmethod
     async def get_person_name_for_edit(update: Update, context: CallbackContext):
+        await update.message.delete()
         person_name = update.message.text
         person = Person.get_person_id_by_name_from_telegram_id(update.effective_user.id, person_name)
         
@@ -93,7 +98,7 @@ class PersonController:
         person_name = context.user_data.get("person_name")
         pk = context.user_data.get("pk")
         Person.edit_person_name_by_pk(pk, person_location, person_name)
-        await update.message.reply_text(f"✅ Persona editada con exito!: {person_name}")
+        await update.message.reply_text(f"✅ Persona editada con exito!: {person_name}", reply_markup=ReplyKeyboardRemove())
         context.user_data.clear()
         return ConversationHandler.END
     
@@ -103,6 +108,7 @@ class PersonController:
     @staticmethod
     async def get_persons_for_delete(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
+        await update.message.delete()
         persons_reply_markup, answer = Helper.get_persons_keyboard_from_user(update, context)
 
         await update.message.reply_text(
@@ -119,6 +125,8 @@ class PersonController:
     # DELETE_PERSON
     @staticmethod
     async def delete_person(update: Update, context: CallbackContext):
+
+        await update.message.delete()
         person_name = update.message.text
         person = Person.get_person_id_by_name_from_telegram_id(update.effective_user.id, person_name)
 
@@ -127,7 +135,7 @@ class PersonController:
             return ConversationHandler.END
 
         Person.delete_person_by_name_from_telegram_id(update.effective_user.id, update.message.text)
-        await update.message.reply_text(f"Persona borrada con exito!: {person_name}", reply_markup=ReplyKeyboardRemove())
+        await update.message.reply_text(f"✅ Persona borrada con exito!: {person_name}", reply_markup=ReplyKeyboardRemove())
         return ConversationHandler.END
     
 person_conversation_handler = ConversationHandler(
@@ -144,5 +152,5 @@ person_conversation_handler = ConversationHandler(
         ConversationStates.DELETE_PERSON: [MessageHandler(filters.TEXT & ~filters.COMMAND, PersonController.delete_person)],
         ConversationStates.GET_LOCATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, PersonController.get_person_location)],
     },
-    fallbacks=[CommandHandler("cancelar", PersonController.cancel_operations), MessageHandler(filters.ALL, PersonController.cancel_operations)],
+    fallbacks=[CommandHandler("cancelar", PersonController.cancel_operations), MessageHandler(filters.COMMAND, PersonController.cancel_operations)],
 )

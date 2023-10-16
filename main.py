@@ -1,11 +1,12 @@
-from telegram.ext import CommandHandler, CallbackQueryHandler, ConversationHandler
+from telegram.ext import CommandHandler, MessageHandler, filters
 
 from Bot import *
 
 from Controllers.ReservationController.ReservationController import reservation_conversation_handler, reservation_callback_query
 from Controllers.PersonController.PersonController import person_conversation_handler
-from Controllers.AdminController import AdminController
+
 from Controllers.UserController import UserController
+from Controllers.AdminController import AdminController
 from Controllers.HelpController import Tutorial
 
 def main() -> None:
@@ -13,7 +14,7 @@ def main() -> None:
 
     # Commands
     guagua_pr_bot.application.add_handlers([
-        CommandHandler("start", UserController.register_user ),
+        CommandHandler("start", UserController.register_user),
         CommandHandler("forward", AdminController.forward_message ),
         CommandHandler("forward_clean", AdminController.forward_message_and_clean_reservations ),
         CommandHandler("get_listado", AdminController.get_list_reservation),

@@ -79,6 +79,10 @@ class Reservation:
                     )) WHERE telegram_id = ? AND name = ?
         """, (telegram_id, person_name)).fetchone()
         return result
+
+    def get_all_locations():
+        result = db.execute("SELECT Person.location FROM Reservation INNER JOIN Person ON id = person_id GROUP BY Person.location").fetchall()
+        return result
     
     @staticmethod
     def clean():

@@ -36,6 +36,14 @@ class AdminController:
     async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
         Reservation.clean()
 
+    async def get_locations(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        locations = Reservation.get_all_locations()
+        answer = "🌉 Puentes a parar:\n --------------------------------------\n"
+        for location, in locations:
+            answer += f"- {location}\n"
+        await update.message.reply_text(answer)
+            
+
     async def get_list_reservation(update: Update, context: ContextTypes.DEFAULT_TYPE):
         all_reservation = Reservation.get_all_reservations()
         answer = "🟩 Listado de reservas \nOrden | Nombre | Puente | Reservado por \n --------------------------------------------------\n"

@@ -15,11 +15,14 @@ def main() -> None:
     # Commands
     guagua_pr_bot.application.add_handlers([
         CommandHandler("start", UserController.register_user),
+        CommandHandler("tutorial", Tutorial.get_tutorial),
+
+        # Admin Commands
         CommandHandler("clean", AdminController.clean),
         CommandHandler("forward", AdminController.forward_message ),
         CommandHandler("forward_clean", AdminController.forward_message_and_clean_reservations ),
         CommandHandler("get_listado", AdminController.get_list_reservation),
-        CommandHandler("tutorial", Tutorial.get_tutorial)
+        CommandHandler("puentes", AdminController.get_locations)
     ])
     
     # Conversation Handlers

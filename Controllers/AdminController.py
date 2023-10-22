@@ -1,3 +1,5 @@
+import textwrap
+
 from telegram import Update, CallbackQuery
 from telegram.ext import ContextTypes, CallbackContext
 
@@ -49,5 +51,5 @@ class AdminController:
         answer = "🟩 Listado de reservas \nOrden | Nombre | Puente | Reservado por \n --------------------------------------------------\n"
         for reservation in all_reservation:
             order, name, location, reserved_by = reservation
-            answer += f"{order} - {name} | Puente: {location}: por {reserved_by}\n"
-        await update.message.reply_text(answer, parse_mode="Markdown")
+            answer += f"{order} - {name} | Puente: {location} | Por {reserved_by}\n"
+        await update.message.reply_text(answer)

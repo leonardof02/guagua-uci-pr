@@ -4,6 +4,8 @@ from typing import Sequence
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes, CallbackContext, ConversationHandler, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 
+from Constants.NumericConstants import MAX_FAILS
+
 from Controllers.UserController import UserController
 from Controllers.ReservationController.ConversationStates import ConversationStates
 
@@ -30,26 +32,29 @@ class ReservationController:
         await update.message.reply_text(answer, parse_mode="Markdown", reply_markup=ReplyKeyboardMarkup(persons_reply_markup))
         return ConversationStates.CREATE_RESERVATION
 
-
-
     @staticmethod
     async def get_reservations(update: Update, context: ContextTypes.DEFAULT_TYPE):
         telegram_id = update.effective_user.id
         reservations = Reservation.get_all_reservations_by_telegram_id(telegram_id)
 
         if(not reservations):
-            await update.message.reply_text("🚧 *No tienes personas registradas*", parse_mode="Markdown")
+            await update.message.reply_text("🚧 *No tienes ninguna reserva*", parse_mode="Markdown")
             return
 
         for reservation in reservations:
             ( reservation_id, arrival_order, name) = reservation
             action = { "name": "CANCEL_RESERVATION", "pk": reservation_id }
             cancel_reservation_button = InlineKeyboardButton("🚫🚌 Cancelar", callback_data=json.dumps(action))
+            failNumber = "" if arrival_order <= MAX_FAILS else f"⚠️ *Fallo:* {arrival_order - MAX_FAILS}"
             await update.message.reply_text(
-                f"🪪 {name}\n*🔢 Turno:* {arrival_order}",
+                f"🪪 {name}\n*🔢 Turno:* {arrival_order}\n",
                 parse_mode="Markdown",
                 reply_markup=InlineKeyboardMarkup([[cancel_reservation_button]])
             )
+
+        if( update.message.text == "/reservar_todos" ):
+            await update.message.reply_text("✅ Todas las personas han sido reservadas con exito!")
+
 
     @staticmethod
     async def create_reservation_for_all_person(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -60,7 +65,6 @@ class ReservationController:
             (id, *_) = person
             if( not Reservation.exist_person(id) ):
                 Reservation.create_reservation( telegram_id, id )
-        await update.message.reply_text("✅ Todas las personas han sido reservadas con exito!")
         await ReservationController.get_reservations(update, context)
 
     # Create a unique reservation by User
@@ -87,7 +91,7 @@ class ReservationController:
 
         action = { "name": "CANCEL_RESERVATION", "pk": reservation_id }
         cancel_reservation_button = InlineKeyboardButton("🚫🚌 Cancelar", callback_data=json.dumps(action))
-        failNumber = "" if arrival_order <= 45 else f"⚠️ *Fallo:* {arrival_order - 45}"
+        failNumber = "" if arrival_order <= MAX_FAILS else f"⚠️ *Fallo:* {arrival_order - MAX_FAILS}"
 
         await update.message.reply_text(
             f"🪪 {person_name}\n*🔢 Turno:* {arrival_order}\n{failNumber}",

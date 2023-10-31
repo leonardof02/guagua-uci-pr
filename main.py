@@ -22,6 +22,7 @@ def main() -> None:
         CommandHandler("forward", AdminController.forward_message ),
         CommandHandler("forward_clean", AdminController.forward_message_and_clean_reservations ),
         CommandHandler("get_listado", AdminController.get_list_reservation),
+        CommandHandler("ver_lista", AdminController.get_list_reservation_file),
         CommandHandler("puentes", AdminController.get_locations)
     ])
     

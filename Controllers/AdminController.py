@@ -1,4 +1,4 @@
-import textwrap
+import io
 
 from telegram import Update, CallbackQuery
 from telegram.ext import ContextTypes, CallbackContext
@@ -36,6 +36,8 @@ class AdminController:
 
     # Admin Utilities
     async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if( not AdminController.is_from_admin(id) ):
+            return
         Reservation.clean()
 
     async def get_locations(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -51,5 +53,17 @@ class AdminController:
         answer = "🟩 Listado de reservas \nOrden | Nombre | Puente | Reservado por \n --------------------------------------------------\n"
         for reservation in all_reservation:
             order, name, location, reserved_by = reservation
-            answer += f"{order} - {name} | Puente: {location} | Por {reserved_by}\n"
+            answer += f"{order}  {name} || Puente: {location} || Por {reserved_by}\n"
         await update.message.reply_text(answer)
+
+    @staticmethod
+    async def get_list_reservation_file(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        all_reservation = Reservation.get_all_reservations()
+        answer = "🟩 Listado de reservas \nOrden | Nombre | Puente | Reservado por \n --------------------------------------------------\n"
+        for reservation in all_reservation:
+            order, name, location, *rest = reservation
+            answer += f"{order}  {name} || Puente: {location}\n"
+        
+        list_txt = io.BytesIO(answer.encode())
+        list_txt.name = "Lista.txt"
+        await update.message.reply_document(document=list_txt, filename="Lista Guagua Pinar")

@@ -1,5 +1,3 @@
-import pathlib
-
 from telegram import Update, CallbackQuery
 from telegram.ext import ContextTypes, CallbackContext
 

@@ -91,7 +91,7 @@ class PersonController:
 
         (pk,) = person
         context.user_data["pk"] = pk
-        await update.message.reply_text("Inserte el nombre nuevo de la persona: ", reply_markup=ReplyKeyboardRemove())
+        await update.message.reply_text("🔤 Inserte el nombre y apellido de la persona: ", reply_markup=ReplyKeyboardRemove())
         return ConversationStates.GET_LOCATION
     
     @staticmethod
@@ -103,7 +103,7 @@ class PersonController:
             return ConversationHandler.END
 
         context.user_data["person_name"] = update.message.text
-        await update.message.reply_text("🗺️ Inserte el municipio de la persona: ", reply_markup=ReplyKeyboardRemove())
+        await update.message.reply_text("🗺️ Inserte el puente de recogida/bajada de la guagua: ", reply_markup=ReplyKeyboardRemove())
         if (context.user_data.get("pk")):
             return ConversationStates.EDIT_PERSON
         else:
@@ -163,10 +163,10 @@ class PersonController:
     
 person_conversation_handler = ConversationHandler(
     entry_points=[
-        CommandHandler("list", PersonController.get_persons),
-        CommandHandler("new", PersonController.start_register_person),
-        CommandHandler("edit", PersonController.get_persons_for_edit),
-        CommandHandler("delete", PersonController.get_persons_for_delete),
+        CommandHandler("mis_personas", PersonController.get_persons),
+        CommandHandler("nueva_persona", PersonController.start_register_person),
+        CommandHandler("editar_persona", PersonController.get_persons_for_edit),
+        CommandHandler("borrar_persona", PersonController.get_persons_for_delete),
     ],
     states={
         ConversationStates.REGISTER_PERSON: [MessageHandler(filters.TEXT & ~filters.COMMAND, PersonController.register_person)],

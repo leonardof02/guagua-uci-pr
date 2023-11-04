@@ -8,14 +8,14 @@ class Tutorial:
 🚌 Tutorial bot GUAGUA UCI / PR
 
 En el menu de comandos estan todas las utilidades
-==Nota==: Este tutorial es accesible desde el comando /tutorial
+💡 Nota: Este tutorial es accesible desde el comando /tutorial
 
 *Para anotar a alguien primero hay que registrarlo, este paso es obligatiorio*
 🟥 Se registra una sola vez, el bot guarda el usuario creado.
 
 /nueva_persona - Registra una nueva persona
 A la hora de registrar te pide el nombre y el puente donde te recogen/te bajas
-==Nota==: Debes agregarte a ti mismo y a otras personas (opcional) para poder anotarse a la lista
+💡 Nota: Debes agregarte a ti mismo y a otras personas (opcional) para poder anotarse a la lista
 
 /mis_personas - Muestra las personas que tienes registradas en forma de lista
 

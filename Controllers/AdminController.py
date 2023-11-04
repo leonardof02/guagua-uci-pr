@@ -13,7 +13,6 @@ class AdminController:
     @staticmethod
     def is_from_admin(user_id) -> bool:
         return user_id == ID_ADMIN
-    
 
     # Comunication with users
     async def forward_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -36,6 +35,7 @@ class AdminController:
 
     # Admin Utilities
     async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        id = update.effective_user.id
         if( not AdminController.is_from_admin(id) ):
             return
         Reservation.clean()

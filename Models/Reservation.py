@@ -86,6 +86,7 @@ class Reservation:
     
     @staticmethod
     def clean():
+        print("Clearing db...")
         db.execute("DELETE FROM Reservation")
         connection.commit()
 

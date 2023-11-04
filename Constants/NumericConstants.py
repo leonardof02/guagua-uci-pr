@@ -1,1 +1,1 @@
-MAX_FAILS = 50
+MAX_FAILS = 80

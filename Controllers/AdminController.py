@@ -59,7 +59,7 @@ class AdminController:
     @staticmethod
     async def get_list_reservation_file(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         all_reservation = Reservation.get_all_reservations()
-        answer = "🟩 Listado de reservas \nOrden | Nombre | Puente | Reservado por \n --------------------------------------------------\n"
+        answer = "🟩 Listado de reservas \nOrden | Nombre | Puente \n --------------------------------------------------\n"
         for reservation in all_reservation:
             order, name, location, *rest = reservation
             answer += f"{order}  {name} || Puente: {location}\n"

@@ -19,3 +19,6 @@ class UserController:
         User.create_user(user_id, full_name)
         await update.message.reply_text(rf"✅ El usuario: {full_name} fue registrado satisfactoriamente")
         await Tutorial.get_tutorial(update, context)
+
+    async def delete_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        pass

@@ -2,6 +2,7 @@ import io
 
 from telegram import Update, CallbackQuery
 from telegram.ext import ContextTypes, CallbackContext
+from telegram.error import Forbidden
 
 from Constants.Env import ID_ADMIN
 from Models.User import User
@@ -21,7 +22,10 @@ class AdminController:
             return
         for chat_id in User.get_all_users_chat_id():
             (user_id,) = chat_id
-            await context.bot.send_message( chat_id=user_id, text=update.message.text.removeprefix("/forward "))
+            try:
+                await context.bot.send_message( chat_id=user_id, text=update.message.text.removeprefix("/forward "))
+            except Forbidden:
+                print(f"User blocked the bot : {update.effective_user.id}")
 
     async def forward_message_and_clean_reservations(update: Update, context: ContextTypes.DEFAULT_TYPE):
         id = update.effective_user.id
@@ -31,7 +35,10 @@ class AdminController:
         Reservation.clean()
         for chat_id in User.get_all_users_chat_id():
             (user_id,) = chat_id
-            await context.bot.send_message( chat_id=user_id, text=update.message.text.removeprefix("/forward_clean "))
+            try:
+                await context.bot.send_message( chat_id=user_id, text=update.message.text.removeprefix("/forward_clean "))
+            except Forbidden:
+                print(f"User blocked the bot : {update.effective_user.id}")
 
     # Admin Utilities
     async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):

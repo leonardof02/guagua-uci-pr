@@ -24,7 +24,7 @@ class Helper:
             (id, name, location) = person
             button_text = f"{name}"
             persons_reply_markup.append([button_text])
-            answer += f"🚹 - {name} | 🗺️ Municipio: {location}\n"
+            answer += f"🚹 - {name} | 🌉 Puente: {location}\n"
 
         persons_reply_markup.append(["/cancelar ❌"])
         

@@ -3,6 +3,7 @@ from telegram.ext import ContextTypes
 
 class Tutorial:
 
+    # Text in Markdown
     tutorial = """
 
 🚌 Tutorial bot GUAGUA UCI / PR
@@ -13,20 +14,20 @@ En el menu de comandos estan todas las utilidades
 *Para anotar a alguien primero hay que registrarlo, este paso es obligatiorio*
 🟥 Se registra una sola vez, el bot guarda el usuario creado.
 
-/nueva_persona - Registra una nueva persona
+/nueva\_persona - Registra una nueva persona
 A la hora de registrar te pide el nombre y el puente donde te recogen/te bajas
-💡 Nota: Debes agregarte a ti mismo y a otras personas (opcional) para poder anotarse a la lista
+💡 Nota: Debes agregarte a ti mismo (obligatorio) y a otras personas (opcional) para poder anotarse a la lista
 
-/mis_personas - Muestra las personas que tienes registradas en forma de lista
+/mis\_personas - Muestra las personas que tienes registradas en forma de lista
 
-/editar_persona y /delete_persona
+/editar\_persona y /borrar\_persona
 Editar y borrar personas registradas respectivamente
 
 *Para anotarse existen 2 opciones:*
-/reservar_todos - Reserva (anota a la lista) a todas las personas que tienes registradas
+/reservar\_todos - Reserva (anota a la lista) a todas las personas que tienes registradas
 /reservar - Te pide que selecciones una persona especifica del grupo de registradas para anotarse de forma individual
 
-/ver_lista - Para ver la lista hasta el momento en formato .txt
+/ver\_lista - Para ver la lista hasta el momento en formato .txt
 Una vez registrados te muestra una lista de los turnos con el numero de cada uno y el orden de llamada a la lista.
 Ademas tiene un boton de cancelar para poder cederle el puesto a otro y asi mejore la distribucion.
 
@@ -43,4 +44,4 @@ Si tienen alguna sugerencia o error pueden escribirme al privado con los detalle
     @staticmethod
     async def get_tutorial(update: Update, context: ContextTypes.DEFAULT_TYPE):
         tutorial = Tutorial.tutorial
-        await update.message.reply_markdown_v2(tutorial, reply_markup=ReplyKeyboardRemove())
+        await update.message.reply_markdown(tutorial, reply_markup=ReplyKeyboardRemove())

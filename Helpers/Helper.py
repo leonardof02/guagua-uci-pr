@@ -21,7 +21,7 @@ class Helper:
         answer = "*📜 Personas registradas:* \n------------------------------------------\n"
         
         for person in persons:
-            (id, name, location) = person
+            (ci, name, location) = person
             button_text = f"{name}"
             persons_reply_markup.append([button_text])
             answer += f"🚹 - {name} | 🌉 Puente: {location}\n"

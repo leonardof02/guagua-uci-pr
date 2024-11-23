@@ -8,10 +8,10 @@ class Reservation:
             CREATE TABLE IF NOT EXISTS "Reservation" (
                 reservation_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 user_id INTEGER NOT NULL,
-                person_id INTEGER NOT NULL,
+                person_ci INTEGER NOT NULL,
                 created_at TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES User(telegram_id),
-                FOREIGN KEY (person_id) REFERENCES Person(id)
+                FOREIGN KEY (person_ci) REFERENCES Person(ci)
             );
         """)
         connection.commit()
@@ -23,7 +23,7 @@ class Reservation:
                 FROM (
                     SELECT Person.name, Reservation.created_at, Person.location, User.telegram_id, User.full_name as reservado_por
                         FROM Reservation
-                        INNER JOIN Person ON Person.id = Reservation.person_id
+                        INNER JOIN Person ON Person.ci = Reservation.person_ci
                         INNER JOIN "User" ON User.telegram_id = Reservation.user_id
                 )
         """)
@@ -37,7 +37,7 @@ class Reservation:
                 FROM (
                     SELECT Reservation.reservation_id, Person.name, Reservation.created_at, User.telegram_id, User.full_name as reservado_por
                         FROM Reservation
-                        INNER JOIN Person ON Person.id = Reservation.person_id
+                        INNER JOIN Person ON Person.ci = Reservation.person_ci
                         INNER JOIN "User" ON User.telegram_id = Reservation.user_id
                 )) WHERE telegram_id = ?
         """, (telegram_id,)).fetchall()
@@ -51,19 +51,19 @@ class Reservation:
                 FROM (
                     SELECT Reservation.reservation_id, Person.name, Reservation.created_at, User.telegram_id, User.full_name as reservado_por
                         FROM Reservation
-                        INNER JOIN Person ON Person.id = Reservation.person_id
+                        INNER JOIN Person ON Person.ci = Reservation.person_ci
                         INNER JOIN "User" ON User.telegram_id = Reservation.user_id
                 )) WHERE reservation_id = ?
         """, (reservation_id,)).fetchone()
         return result
 
     @staticmethod
-    def create_reservation(telegram_id: int, person_id: int):
+    def create_reservation(telegram_id: int, person_ci: int):
         db.execute("""--sql
-            INSERT INTO "Reservation" (user_id, person_id, created_at)
+            INSERT INTO "Reservation" (user_id, person_ci, created_at)
             VALUES
                 ( ?, ?, datetime('now') );
-        """, (telegram_id, person_id))
+        """, (telegram_id, person_ci))
         connection.commit()
 
     @staticmethod
@@ -74,14 +74,14 @@ class Reservation:
                     FROM (
                         SELECT Reservation.reservation_id, Person.name, Reservation.created_at, User.telegram_id, User.full_name as reservado_por
                             FROM Reservation
-                            INNER JOIN Person ON Person.id = Reservation.person_id
+                            INNER JOIN Person ON Person.ci = Reservation.person_ci
                             INNER JOIN "User" ON User.telegram_id = Reservation.user_id
                     )) WHERE telegram_id = ? AND name = ?
         """, (telegram_id, person_name)).fetchone()
         return result
 
     def get_all_locations():
-        result = db.execute("SELECT Person.location FROM Reservation INNER JOIN Person ON id = person_id GROUP BY Person.location").fetchall()
+        result = db.execute("SELECT Person.location FROM Reservation INNER JOIN Person ON id = person_ci GROUP BY Person.location").fetchall()
         return result
     
     @staticmethod
@@ -96,9 +96,9 @@ class Reservation:
         return True if result else False
 
     @staticmethod
-    def exist_person(person_id: int) -> bool:
-        result = db.execute("""SELECT person_id FROM Reservation WHERE person_id = ?""", (person_id,)).fetchone()
-        return True if result else False
+    def exist_person(person_ci: int) -> bool:
+        result = db.execute("""SELECT person_ci, full_name, user_id as name FROM Reservation INNER JOIN User ON User.telegram_id = Reservation.user_id WHERE person_ci = ?""", (person_ci,)).fetchone()
+        return result
     
     @staticmethod
     def existsByUserId(telegram_id: int):

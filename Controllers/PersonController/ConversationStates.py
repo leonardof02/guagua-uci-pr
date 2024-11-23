@@ -7,3 +7,4 @@ class ConversationStates(Enum):
     START_EDIT_PERSON = 3
     EDIT_PERSON = 4
     DELETE_PERSON = 5
+    GET_CI_OF_PERSON = 6

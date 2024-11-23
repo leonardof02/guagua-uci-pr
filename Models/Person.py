@@ -7,6 +7,7 @@ class Person:
         db.execute("""--sql
             CREATE TABLE IF NOT EXISTS "Person" (
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                ci VARCHAR(255) NOT NULL,
                 name TEXT NOT NULL,
                 location TEXT NOT NULL,
                 user_id INTEGER NOT NULL,
@@ -16,13 +17,13 @@ class Person:
         """)
 
     @staticmethod
-    def create_person(name: str, location: str, telegram_id: int):
+    def create_person(ci: str, name: str, location: str, telegram_id: int):
         db.execute("""--sql
-            INSERT INTO "Person" (name, location, user_id, created_at)
+            INSERT INTO "Person" (ci, name, location, user_id, created_at)
             VALUES
-                ( ?, ?, ?, datetime('now') );
+                ( ?, ?, ?, ?, datetime('now') );
         """,
-        ( name, location, telegram_id ))
+        ( ci, name, location, telegram_id ))
         connection.commit()
 
     @staticmethod
@@ -41,12 +42,12 @@ class Person:
         return result
     
     @staticmethod
-    def get_all_persons_by_telegram_id(telegram_id: int) -> list[tuple[str]]:
-        result: list = db.execute("""SELECT id, name, location FROM 'Person' WHERE user_id = ?;""", (telegram_id,)).fetchall()
+    def get_all_persons_by_telegram_id(person_ci: int) -> list[tuple[str]]:
+        result: list = db.execute("""SELECT ci, name, location FROM 'Person' WHERE user_id = ?;""", (person_ci,)).fetchall()
         return result
     
-    def get_person_id_by_name_from_telegram_id(telegram_id: int, name: str) -> str:
-        result: list = db.execute("""SELECT id FROM 'Person' WHERE user_id = ? AND name = ?;""", (telegram_id, name)).fetchone()
+    def get_person_ci_by_name_from_telegram_id(telegram_id: int, name: str) -> str:
+        result: list = db.execute("""SELECT ci FROM 'Person' WHERE user_id = ? AND name = ?;""", (telegram_id, name)).fetchone()
         return result
     
     @staticmethod
